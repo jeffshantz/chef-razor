@@ -1,0 +1,49 @@
+---
+driver:
+  name: vagrant
+  network:
+    - ["private_network", { ip: "172.16.0.1", virtualbox__intnet: "kitchen-razor" }]
+
+provisioner:
+  name: chef_solo
+
+platforms:
+  - name: ubuntu-14.04
+#  - name: centos-6.5
+
+suites:
+  - name: default
+    data_bag_path: "test/integration/default/data_bags"
+    encrypted_data_bag_secret_key_path: "test/integration/default/fake-secret"
+    run_list:
+      - "recipe[certificate::manage_by_attributes]"
+      - "recipe[razor::server]"
+    attributes:
+      certificate:
+        - test:
+            cert_file: "test.pem"
+            key_file: "test.key"
+      postgresql:
+        password:
+          # 'qweqwe' - Be sure to change this.
+          # Generated with: echo -n 'qweqwe''postgres' | openssl md5 | sed -e 's/.* /md5/'
+          # Note that this is the database password.  The postgres Linux user's password
+          # is disabled.
+          postgres: d2d430490cc35011e0941f20108c8c4e
+      razor:
+        bootstrap_hostname: 172.16.0.1
+        bootstrap_port: 80
+        enable_ssl: true
+        ssl_cert: /etc/ssl/certs/test.pem
+        ssl_key: /etc/ssl/private/test.key
+        nic_max: 12
+        dhcp:
+          - start_ip: "172.16.0.100"
+            end_ip: "172.16.0.200"
+            netmask: "255.255.255.0"
+            lease: "12h"
+        proxydhcp:
+          - network: "192.168.0.0"
+            netmask: "255.255.252.0"
+          - network: "10.50.0.0"
+            netmask: "255.255.0.0"
