@@ -28,7 +28,7 @@ current_version_dir = File.join(node[:razor][:install_dir], node[:razor][:curren
 microkernel_tarball = File.join(Chef::Config[:file_cache_path],"razor-microkernel-latest.tar")
 dist_file = "razor-server-#{node[:razor][:version]}.zip"
 extracted_dir = "razor-#{node[:razor][:version]}"
-basic_auth_encoded = Base64.encode64("#{node[:razor][:admin_user]}:#{node[:razor][:admin_password]}").chomp
+basic_auth_encoded = Base64.strict_encode64("#{node[:razor][:admin_user]}:#{node[:razor][:admin_password]}")
 
 node[:razor][:packages].each do |pkg|
   package pkg do
