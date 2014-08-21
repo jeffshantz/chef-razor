@@ -122,6 +122,18 @@ This cookbook depends on the following cookbooks:
     <td>Networks to which we want to serve as a proxyDHCP server (i.e. boot parameters only).  This is useful when there is already an authoritative DHCP server running on the network.  Should be in the form: <tt>[ { network: '172.16.10.0', netmask: '255.255.252.0' } ]</tt></td>
     <td><tt>[]</tt></td>
   </tr>
+  <tr>
+    <td><tt>node[:razor][:ignore_unknown_macs]</tt></td>
+    <td>Boolean</td>
+    <td>
+      <p>Whether or not to ignore requests from unknown MAC addresses.  Razor handles this, so it should not really be necessary, but it avoids having an unknown node boot into the Razor microkernel.</p>
+      <p>If you enable this, you'll need to create a configuration file in <tt>/etc/dnsmasq.d</tt> listing all known nodes.  You can use any tags you like.  For example, you might create a file <tt>/etc/dnsmasq.d/nodes.conf:</p>
+      <pre><code>dhcp-host=82:de:80:ff:91:78,set:staff
+dhcp-host=82:de:80:ff:12:4b,set:manager
+dhcp-host=82:de:80:ff:96:39,set:staff</code></pre>
+    </td>
+    <td><tt>false</tt></td>
+  </tr>
 
 </table>
 

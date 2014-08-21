@@ -81,6 +81,8 @@ default[:razor][:dhcp] = []
 
 default[:razor][:proxydhcp] = []
 
+default[:razor][:ignore_unknown_macs] = false
+
 ################################################################################
 # General parameters -- you likely do not need to change these.                #
 ################################################################################

@@ -20,9 +20,12 @@ port=0
 # to avoid problems in such a case.
 dhcp-no-override
 
-# Uncomment to ignore requests from unknown MAC addresses.  Razor should handle
-# this, so it should not be necessary to enable this.
-#dhcp-ignore=tag:!known
+<% if node[:razor][:ignore_unknown_macs] -%>
+# Ignore requests from unknown MAC addresses.  Razor handles this, so it should
+# not really be necessary, but it avoids having an unknown node boot into the
+# Razor microkernel.
+dhcp-ignore=tag:!known
+<% end -%>
 
 # If the client is already running iPXE (or has already loaded undionly), 
 # serve uip bootstrap.ipxe
