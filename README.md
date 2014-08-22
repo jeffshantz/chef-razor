@@ -51,15 +51,15 @@ This cookbook depends on the following cookbooks:
     <td><tt>http://boot.ipxe.org/undionly.kpxe</tt></td>
   </tr>
   <tr>
-    <td><tt>node[:razor][:admin_user]</tt></td>
+    <td><tt>node[:razor][:bootstrap_user]</tt></td>
     <td>String</td>
-    <td>Username for the Razor admin.  Used to download the bootstrap script during cookbook installation.  <strong>Note:</strong> This user/password must be present in <tt>node[:razor][:api_users]</tt>.</td>
-    <td><tt>admin</tt></td>
+    <td>Username of an unprivileged user that will be used to download bootstrap.ipxe during cookbook installation.  <strong>Note:</strong> This user/password must be present in <tt>node[:razor][:api_users]</tt>.</td>
+    <td><tt>bootstrap</tt></td>
   </tr>
   <tr>
-    <td><tt>node[:razor][:admin_password]</tt></td>
+    <td><tt>node[:razor][:bootstrap_password]</tt></td>
     <td>String</td>
-    <td>Password for the Razor admin.  Used to download the bootstrap script during cookbook installation.  <strong>Note:</strong> This user/password must be present in <tt>node[:razor][:api_users]</tt>.</td>
+    <td>Password of an unprivileged user that will be used to download bootstrap.ipxe during cookbook installation.  This attribute must contain the password in cleartext.  Note that this cookbook assigns this user <strong>no</strong> permissions to the API -- it can really only download bootstrap.ipxe. <strong>Note:</strong> This user/password must be present in <tt>node[:razor][:api_users]</tt>.</td>
     <td><tt>razor</tt></td>
   </tr>
   <tr>
@@ -107,8 +107,15 @@ This cookbook depends on the following cookbooks:
   <tr>
     <td><tt>node[:razor][:api_users]</tt></td>
     <td>Array of hashes</td>
-    <td>Credentials for users allowed to access the Razor API.  Passwords must be hashed/salted using the <tt>shiro-tools-hasher</tt> JAR.  The cookbook writes this to <tt>node[:razor][:install_dir]</tt>, or you can download it yourself on your own system.</td>
-    <td><tt>[ { username: 'admin', password: '$shiro1$SHA-256$500000$7p4TipHWV1BeqKDdOk3u1A==$Qt/0TXCc2jAoiSKZqj6VA9uAZhidEASiL9B69oEvh8Q=' } ]  # admin / razor</tt></td>
+    <td>
+      <p>Credentials for users allowed to access the Razor API.  Passwords must be hashed/salted using the <tt>shiro-tools-hasher</tt> JAR.  The cookbook writes this to <tt>node[:razor][:install_dir]</tt>, or you can download it yourself on your own system.</p>
+      <p>Note that <tt>node[:razor][:bootstrap_user]</tt> must exist in this array and should contain the 
+         hashed version of <tt>node[:razor][:bootstrap_password]</tt>.  This user will not be assigned to any
+         roles.
+      </p>
+      <p><strong>All other users defined in this array will be given admin privileges to the API.</strong></p>
+    </td>
+    <td><tt>[ { username: 'bootstrap', password: '$shiro1$SHA-256$500000$7p4TipHWV1BeqKDdOk3u1A==$Qt/0TXCc2jAoiSKZqj6VA9uAZhidEASiL9B69oEvh8Q=' } ]  # bootstrap / razor</tt></td>
   </tr>
   <tr>
     <td><tt>node[:razor][:dhcp]</tt></td>

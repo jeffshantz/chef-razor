@@ -24,6 +24,9 @@ iniRealm.credentialsMatcher = $passwordMatcher
 
 [users]
 <% node[:razor][:api_users].each do |user| -%>
-<%= user[:username] %> = <%= user[:password] %>
+<%= user[:username] %> = <%= user[:password] %><%= ",admin" unless user[:username] == node[:razor][:bootstrap_user] %>
 <% end -%>
+
+[roles]
+admin = *
 

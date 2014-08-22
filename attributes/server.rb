@@ -33,12 +33,16 @@ override[:torquebox][:version] = '3.0.1'
 default[:razor][:microkernel_url] = 'http://links.puppetlabs.com/razor-microkernel-latest.tar'
 default[:razor][:undionly_url] = 'http://boot.ipxe.org/undionly.kpxe'
 
-# These should match up with one of the users defined in node[:razor][:api_users].
-default[:razor][:admin_user] = 'admin'
-default[:razor][:admin_password] = 'razor'
+# Username and password of a unprivileged user that is used to download bootstrap.ipxe from the
+# Razor server into the TFTP root.  These should match up with one of the users defined in node[:razor][:api_users].
+# The password must be in cleartext here.  Note that this cookbook gives no permissions to the API to this user.  It
+# can really only download bootstrap.ipxe.
+default[:razor][:bootstrap_user] = 'bootstrap'
+default[:razor][:bootstrap_password] = 'razor'
 
 default[:razor][:nic_max] = 4
 default[:razor][:bootstrap_hostname] = node[:fqdn]
+default[:razor][:bootstrap_ipxe_url] = "tftp://#{node[:razor][:bootstrap_hostname]}/bootstrap.ipxe"
 default[:razor][:bootstrap_url] = "http://#{node[:razor][:bootstrap_hostname]}/api/microkernel/bootstrap?nic_max=#{node[:razor][:nic_max]}"
 
 default[:razor][:enable_ssl] = false
@@ -52,10 +56,15 @@ default[:razor][:database][:password] = 'razor'
 # using the shiro-tools-hasher JAR (which is written to node[:razor][:install_dir])
 #
 # java -jar /opt/razor/shiro-tools-hasher-1.2.3-cli.jar -p
-
+#
+# Note that node[:razor][:bootstrap_user] must exist in this array and should contain the 
+# hashed version of node[:razor][:bootstrap_password].  This user will not be assigned to any
+# roles.
+#
+# All other users defined in this array will be given admin privileges to the API.
 default[:razor][:api_users] = [
-  # admin / razor  (be sure to remove this and create a user of your own)
-  { username: 'admin', password: '$shiro1$SHA-256$500000$7p4TipHWV1BeqKDdOk3u1A==$Qt/0TXCc2jAoiSKZqj6VA9uAZhidEASiL9B69oEvh8Q=' }
+  # bootstrap / razor
+  { username: 'bootstrap', password: '$shiro1$SHA-256$500000$7p4TipHWV1BeqKDdOk3u1A==$Qt/0TXCc2jAoiSKZqj6VA9uAZhidEASiL9B69oEvh8Q=' }
 ]
 
 # Networks to which we want to serve as a DHCP server (i.e. IP address and boot parameters).

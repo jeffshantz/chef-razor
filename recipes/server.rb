@@ -28,7 +28,7 @@ current_version_dir = File.join(node[:razor][:install_dir], node[:razor][:curren
 microkernel_tarball = File.join(Chef::Config[:file_cache_path],"razor-microkernel-latest.tar")
 dist_file = "razor-server-#{node[:razor][:version]}.zip"
 extracted_dir = "razor-#{node[:razor][:version]}"
-basic_auth_encoded = Base64.strict_encode64("#{node[:razor][:admin_user]}:#{node[:razor][:admin_password]}")
+basic_auth_encoded = Base64.strict_encode64("#{node[:razor][:bootstrap_user]}:#{node[:razor][:bootstrap_password]}")
 
 node[:razor][:packages].each do |pkg|
   package pkg do
@@ -249,13 +249,13 @@ ruby_block 'wait for razor to start' do
 
     success = false
 
-    30.downto(1) do |i|
+    60.downto(1) do |i|
     
       Chef::Log.info("Waiting up to #{i} second(s) for the Razor API to respond...")
       Chef::Log.info(node[:razor][:bootstrap_url])
 
       begin
-        open(node[:razor][:bootstrap_url], :http_basic_authentication=>[node[:razor][:admin_user], node[:razor][:admin_password]]) {}
+        open(node[:razor][:bootstrap_url], :http_basic_authentication=>[node[:razor][:bootstrap_user], node[:razor][:bootstrap_password]]) {}
         success = true
         break
       rescue => ex

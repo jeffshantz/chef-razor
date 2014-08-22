@@ -12,6 +12,10 @@ port=0
 # Disable multicast
 #dhcp-option=vendor:PXEClient,6,2b
 
+# TFTP setup
+enable-tftp
+tftp-root=/var/lib/tftpboot
+
 # Disable re-use of the DHCP servername and filename fields as extra option
 # space.  If it can, dnsmasq moves the boot server and filename information
 # (from dhcp-boot) out of their dedicated fields into DHCP options. This
@@ -27,13 +31,15 @@ dhcp-no-override
 dhcp-ignore=tag:!known
 <% end -%>
 
-# If the client is already running iPXE (or has already loaded undionly), 
-# serve uip bootstrap.ipxe
-dhcp-match=IPXEBOOT,175
-dhcp-boot=net:IPXEBOOT,bootstrap.ipxe
+# If the client is already running iPXE (or has already loaded undionly),
+# serve up bootstrap.ipxe
+dhcp-match=set:ipxe,175 # iPXE sends a 175 option.
 
-# Otherwise, serve up undionly.kpxe, and then bootstrap.ipxe
-dhcp-boot=undionly.kpxe
+# If the client is not already running iPXE, then serve up undionly first
+pxe-service=tag:!ipxe,X86PC, "Booting iPXE", undionly
+
+# Served if the client is running iPXE
+dhcp-boot=<%= node[:razor][:bootstrap_ipxe_url] %>
 
 # Provide DHCP and boot parameters to the following hosts
 
@@ -49,7 +55,3 @@ dhcp-range=<%= range[:start_ip] %>,<%= range[:end_ip] %>,<%= range[:netmask] %>,
 <% node[:razor][:proxydhcp].each do |range| -%>
 dhcp-range=<%= range[:network] %>,proxy,<%= range[:netmask] %>
 <% end -%>
-
-# TFTP setup
-enable-tftp
-tftp-root=/var/lib/tftpboot
